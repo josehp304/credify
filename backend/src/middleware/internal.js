@@ -1,3 +1,5 @@
+import { createHash, timingSafeEqual } from 'crypto';
+
 /**
  * Internal-only gate. The Express API is no longer public: every route except
  * /health and the extension bridge is reachable only via the Next.js proxy,
@@ -5,9 +7,16 @@
  */
 export const requireInternal = (req, res, next) => {
   const secret = process.env.INTERNAL_API_SECRET;
+  const provided = req.headers['x-internal-secret'];
   // Startup validation in server.js guarantees `secret` is set; this guard is
   // defense-in-depth in case the middleware is reused elsewhere.
-  if (!secret || req.headers['x-internal-secret'] !== secret) {
+  if (!secret || typeof provided !== 'string') {
+    return res.status(401).json({ success: false, error: 'Unauthorized' });
+  }
+  // Hash both sides to equal-length buffers, then compare in constant time.
+  const a = createHash('sha256').update(provided).digest();
+  const b = createHash('sha256').update(secret).digest();
+  if (!timingSafeEqual(a, b)) {
     return res.status(401).json({ success: false, error: 'Unauthorized' });
   }
   next();

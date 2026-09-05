@@ -9,7 +9,11 @@ import { eq } from 'drizzle-orm';
 import { GoogleGenAI } from '@google/genai';
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => cb(null, /^image\//.test(file.mimetype)),
+});
 
 // POST /api/v1/id/generate
 router.post('/generate', async (req, res) => {
@@ -100,6 +104,7 @@ router.post('/verify', upload.single('image'), async (req, res) => {
 
     // 3. Perform Actual OCR via Gemini
     let extractedData = {};
+    let ocrFailed = false;
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const prompt = `You are a forensic document verification agent. Match the OCR text from the provided image against the Ground Truth data.
@@ -148,9 +153,28 @@ router.post('/verify', upload.single('image'), async (req, res) => {
       extractedData = JSON.parse(response.text || "{}");
     } catch (apiError) {
       console.error("Gemini OCR Error:", apiError);
+      ocrFailed = true;
     }
-    
-    console.log("OCR Extracted Data:", extractedData); // Logging for debugging
+
+    // An OCR outage must not read as fraud: bail out with UNVERIFIED instead
+    // of letting every field comparison default to a failed match.
+    if (ocrFailed) {
+      const [log] = await db.insert(verificationLogs).values({
+        endpoint: '/api/v1/id/verify',
+        result_status: 'FLAG',
+        details: JSON.stringify({ reason: 'OCR unavailable' })
+      }).returning();
+      return res.json({
+        success: true,
+        result: {
+          verdict: 'UNVERIFIED',
+          reason: 'OCR unavailable, please retry later',
+          tampered_fields: [],
+          all_checks: []
+        },
+        evidence_report_url: `https://credify.io/reports/${log.id}`
+      });
+    }
 
     const ocrResultName = extractedData.name?.value || "UNKNOWN";
     const ocrResultCourse = extractedData.course?.value || "UNKNOWN";

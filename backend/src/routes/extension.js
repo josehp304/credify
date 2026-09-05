@@ -27,10 +27,16 @@ function heuristicFallback(text) {
 
 router.post('/classify', async (req, res) => {
   try {
-    const { reviews } = req.body;
-    if (!reviews || !Array.isArray(reviews)) {
+    const { reviews: rawReviews } = req.body;
+    if (!rawReviews || !Array.isArray(rawReviews)) {
       return res.status(400).json({ error: "Missing or invalid reviews array" });
     }
+    // Public, unauthenticated route: cap batch size and per-review length so a
+    // caller can't run up the Gemini bill with a single request.
+    if (rawReviews.length > 25) {
+      return res.status(400).json({ error: "Too many reviews (max 25 per request)" });
+    }
+    const reviews = rawReviews.map((r) => String(r).slice(0, 1000));
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -50,9 +56,9 @@ Respond ONLY in JSON format containing an array of objects for each review in or
 Reviews to classify:
 ${reviews.map((r, i) => `Review ${i + 1}: ${r}`).join('\n\n')}`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: batchedPrompt }] }],
         generationConfig: {
@@ -78,11 +84,24 @@ ${reviews.map((r, i) => `Review ${i + 1}: ${r}`).join('\n\n')}`;
        return res.json({ results: reviews.map(heuristicFallback) });
     }
 
-    res.json({ results: parsed });
+    // Validate shape per item; never pass raw LLM objects through to clients.
+    const results = parsed.map((item, i) => {
+      const valid = item
+        && (item.label === 'genuine' || item.label === 'spam')
+        && typeof item.confidence === 'number'
+        && Number.isFinite(item.confidence);
+      return valid
+        ? { label: item.label, confidence: Math.min(Math.max(item.confidence, 0), 1) }
+        : heuristicFallback(reviews[i]);
+    });
+
+    res.json({ results });
   } catch (error) {
     console.error("Extension Classify Route Error:", error);
     // Silent heuristics fallback if LLM structured output crashes
-    const fallbackResults = req.body.reviews ? req.body.reviews.map(heuristicFallback) : [];
+    const fallbackResults = Array.isArray(req.body.reviews)
+      ? req.body.reviews.slice(0, 25).map((r) => heuristicFallback(String(r).slice(0, 1000)))
+      : [];
     res.json({ results: fallbackResults });
   }
 });

@@ -7,7 +7,11 @@ import { verificationLogs } from '../db/schema.js';
 import { upsertAndScoreTrustProfile } from '../utils/trustProfile.js';
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => cb(null, /^image\//.test(file.mimetype)),
+});
 
 // POST /api/v1/refund/verify
 router.post('/verify', upload.single('image'), async (req, res) => {

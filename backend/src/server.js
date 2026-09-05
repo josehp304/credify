@@ -12,6 +12,9 @@ if (!process.env.INTERNAL_API_SECRET) {
 }
 
 const app = express();
+// Behind Render's load balancer: trust the first proxy hop so req.ip is the
+// real client IP (the extension rate limiter keys on it).
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // Middleware
