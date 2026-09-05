@@ -124,8 +124,8 @@ export default function ReviewScoringPage() {
               {isScoring && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={styles.processingState}>
                   <div className={styles.spinner} />
-                  <h4>Running 3-Signal Pipeline</h4>
-                  <p>Analyzing NLP syntax, checking spam heuristics, and querying Trust DB...</p>
+                  <h4>Scoring review</h4>
+                  <p>Checking for AI text, spam patterns, and reviewer history...</p>
                 </motion.div>
               )}
 
@@ -147,10 +147,10 @@ export default function ReviewScoringPage() {
                       </div>
                     </div>
                     <div className={styles.scoreDetails}>
-                      <span className={styles.scoreLabel}>CREDIBILITY SCORE</span>
-                      <h2>{result.recommendation === "HIDE" ? "Low Credibility" : "High Credibility"}</h2>
+                      <span className={styles.scoreLabel}>Credibility score</span>
+                      <h2>{result.recommendation === "HIDE" ? "Low credibility" : result.recommendation === "FLAG_FOR_REVIEW" ? "Needs review" : "High credibility"}</h2>
                       <div className={styles.recommendationBadge}>
-                        ACTION: {result.recommendation}
+                        Action: {result.recommendation}
                       </div>
                     </div>
                   </div>

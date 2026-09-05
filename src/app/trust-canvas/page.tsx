@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -23,16 +23,16 @@ import styles from './canvas.module.css';
 // ──────────────────────────────────────────────
 // Endpoint → human label map
 // ──────────────────────────────────────────────
-const ENDPOINT_META: Record<string, { label: string; color: string; emoji: string }> = {
-  '/api/v1/refund/verify':        { label: 'Refund Request',      color: '#f59e0b', emoji: '💸' },
-  '/api/v1/review/score':         { label: 'Review Scored',       color: '#6366f1', emoji: '⭐' },
-  '/api/v1/document/verify':      { label: 'Document Verified',   color: '#10b981', emoji: '📄' },
-  '/api/v1/id/verify':            { label: 'ID Verification',     color: '#3b82f6', emoji: '🪪' },
-  '/api/v1/extension/classify':   { label: 'Review Classified',   color: '#8b5cf6', emoji: '🔍' },
+const ENDPOINT_META: Record<string, { label: string; color: string }> = {
+  '/api/v1/refund/verify':        { label: 'Refund Request',      color: '#e4b363' },
+  '/api/v1/review/score':         { label: 'Review Scored',       color: '#a394e0' },
+  '/api/v1/document/verify':      { label: 'Document Verified',   color: '#3fcf9a' },
+  '/api/v1/id/verify':            { label: 'ID Verification',     color: '#4fb2f5' },
+  '/api/v1/extension/classify':   { label: 'Review Classified',   color: '#7f93ad' },
 };
 
 function getEndpointMeta(endpoint: string) {
-  return ENDPOINT_META[endpoint] ?? { label: endpoint.split('/').pop() ?? 'Event', color: '#64748b', emoji: '⚡' };
+  return ENDPOINT_META[endpoint] ?? { label: endpoint.split('/').pop() ?? 'Event', color: '#7f93ad' };
 }
 
 // ──────────────────────────────────────────────
@@ -40,7 +40,7 @@ function getEndpointMeta(endpoint: string) {
 // ──────────────────────────────────────────────
 function UserNode({ data }: { data: Record<string, unknown> }) {
   const score = data.trust_score as number;
-  const scoreColor = score >= 80 ? '#34d399' : score >= 50 ? '#f59e0b' : '#f87171';
+  const scoreColor = score >= 80 ? '#3fcf9a' : score >= 50 ? '#e4b363' : '#f0716f';
   const initials = ((data.email as string | undefined) ?? '?').slice(0, 2).toUpperCase();
 
   return (
@@ -52,7 +52,7 @@ function UserNode({ data }: { data: Record<string, unknown> }) {
       <div className={styles.userInfo}>
         <div className={styles.userEmail}>{(data.email as string) ?? (data.phone_number as string) ?? 'Unknown'}</div>
         <div className={styles.userMeta}>
-          <span style={{ color: scoreColor }}>★ {score}</span>
+          <span style={{ color: scoreColor }}>{score}</span>
           <span className={styles.pill}>{data.total_checks as number} checks</span>
         </div>
       </div>
@@ -66,17 +66,17 @@ function UserNode({ data }: { data: Record<string, unknown> }) {
 function EventNode({ data }: { data: Record<string, unknown> }) {
   const meta = getEndpointMeta(data.endpoint as string);
   const status = data.result_status as string;
-  const statusColor = status === 'PASS' ? '#34d399' : status === 'FAIL' ? '#f87171' : '#f59e0b';
+  const statusColor = status === 'PASS' ? '#3fcf9a' : status === 'FAIL' ? '#f0716f' : '#e4b363';
 
   return (
-    <div className={styles.eventNode} style={{ borderColor: meta.color + '55' }}>
+    <div className={styles.eventNode}>
       <Handle type="target" position={Position.Left} />
-      <div className={styles.eventHeader} style={{ background: meta.color + '18' }}>
-        <span className={styles.eventEmoji}>{meta.emoji}</span>
-        <span className={styles.eventLabel} style={{ color: meta.color }}>{meta.label}</span>
+      <div className={styles.eventHeader}>
+        <span className={styles.eventDot} style={{ background: meta.color }} />
+        <span className={styles.eventLabel}>{meta.label}</span>
       </div>
       <div className={styles.eventBody}>
-        <span className={styles.statusBadge} style={{ background: statusColor + '22', color: statusColor, borderColor: statusColor + '55' }}>
+        <span className={styles.statusBadge} style={{ color: statusColor, borderColor: statusColor + '55' }}>
           {status}
         </span>
         <span className={styles.eventDate}>
@@ -215,8 +215,8 @@ export default function TrustCanvasPage() {
   }, [setNodes, setEdges]);
 
   const miniMapNodeColor = useCallback((node: { type?: string }) => {
-    if (node.type === 'user') return '#6366f1';
-    return '#334155';
+    if (node.type === 'user') return '#4fb2f5';
+    return '#25314a';
   }, []);
 
   return (
@@ -239,20 +239,17 @@ export default function TrustCanvasPage() {
         fitViewOptions={{ padding: 0.15 }}
         defaultEdgeOptions={{ type: 'smoothstep' }}
       >
-        <Background color="#1e293b" gap={24} size={1} />
+        <Background color="#1b2436" gap={24} size={1} />
         <Controls className={styles.controls} />
         <MiniMap
           nodeColor={miniMapNodeColor}
-          maskColor="rgba(2, 6, 23, 0.85)"
+          maskColor="rgba(3, 7, 18, 0.85)"
           className={styles.minimap}
         />
 
         {/* Stats Panel */}
         <Panel position="top-left" className={styles.statsPanel}>
-          <div className={styles.panelTitle}>
-            <span className={styles.panelDot} />
-            Trust Network Canvas
-          </div>
+          <div className={styles.panelTitle}>Trust network</div>
           <div className={styles.statRow}>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{stats.users}</span>
@@ -263,11 +260,11 @@ export default function TrustCanvasPage() {
               <span className={styles.statLabel}>Events</span>
             </div>
             <div className={styles.statItem}>
-              <span className={styles.statValue} style={{ color: '#34d399' }}>{stats.pass}</span>
+              <span className={styles.statValue} style={{ color: '#3fcf9a' }}>{stats.pass}</span>
               <span className={styles.statLabel}>Pass</span>
             </div>
             <div className={styles.statItem}>
-              <span className={styles.statValue} style={{ color: '#f87171' }}>{stats.fail}</span>
+              <span className={styles.statValue} style={{ color: '#f0716f' }}>{stats.fail}</span>
               <span className={styles.statLabel}>Fail</span>
             </div>
           </div>
@@ -279,7 +276,7 @@ export default function TrustCanvasPage() {
           {Object.entries(ENDPOINT_META).map(([, meta]) => (
             <div key={meta.label} className={styles.legendItem}>
               <span className={styles.legendDot} style={{ background: meta.color }} />
-              <span>{meta.emoji} {meta.label}</span>
+              <span>{meta.label}</span>
             </div>
           ))}
         </Panel>

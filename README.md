@@ -40,7 +40,7 @@ We have moved from a feature-isolated hackathon prototype to a fully integrated,
 
 Detects AI-generated or modified photographs used for fraudulent refund claims.
 
-- **Pipeline**: AI forensics (Hive AI, with Gemini fallback) → Metadata Analysis (EXIF) → Cross-platform history (Trust DB).
+- **Pipeline**: C2PA provenance (signed Content Credentials, parsed locally) → AI forensics (Hive AI, with Gemini fallback) → Metadata Analysis (EXIF) → Cross-platform history (Trust DB).
 - **Endpoint**: `POST /api/v1/refund/verify`
 
 ### 2. Document Watermarking & Verification
@@ -98,6 +98,7 @@ To ensure Credify remains a first-class fraud prevention tool, all future develo
 
 ### **3. AI and Forensics Updates**
 
+- C2PA / Content Credentials parsing lives in `utils/c2paAnalysis.js`, built on the official `@contentauth/c2pa-node`. It runs before the paid classifiers: a valid signed manifest declaring an AI `digitalSourceType` is conclusive. Update the source-type sets there as the C2PA spec evolves.
 - AI models (Hive AI as the primary detector, Gemini as the fallback) should be abstracted in `utils/aiDetection.js`. If models are swapped or updated, only the utility should change, not the routes.
 - EXIF extraction logic is kept in `utils/exifAnalysis.js`. Update this when adding support for newer phone metadata or more forensic signals.
 
@@ -115,6 +116,7 @@ To ensure Credify remains a first-class fraud prevention tool, all future develo
 | **Backend**   | Node.js / Express                      | Core API Engine & Forensics Orchestration   |
 | **Database**  | Neon DB (Serverless Postgres)          | Trust DB, Hashed Records, Logs              |
 | **Auth**      | Neon Auth                              | Identity Provider & Multi-tenant Access     |
+| **Provenance**| `@contentauth/c2pa-node`               | Signed C2PA / Content Credentials parsing & validation |
 | **Forensics** | Hive AI v3 (Gemini fallback)           | AI-generated Image & Deepfake Detection     |
 | **Metadata**  | `exifr` + `jimp`                       | Forensic Analysis & Document Fingerprinting |
 | **AI / OCR**  | Google Gemini API                      | Advanced OCR, NLP review scoring, ID data extraction |
@@ -126,7 +128,7 @@ To ensure Credify remains a first-class fraud prevention tool, all future develo
 
 ### Prerequisites
 
-- Node.js v18+
+- Node.js v22+ (required by `@contentauth/c2pa-node` for provenance parsing)
 - Neon Project (Compute & Auth enabled)
 - Hive AI API Key (`HIVE_API_KEY`, primary image forensics)
 - Google Gemini API Key (`GEMINI_API_KEY`, OCR, review NLP, and AI-detection fallback)

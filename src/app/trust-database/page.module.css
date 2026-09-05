@@ -43,6 +43,12 @@
   margin: 0 auto;
 }
 
+.networkCard,
+.scoreCard,
+.fullWidthCard {
+  min-width: 0;
+}
+
 .sectionTitle {
   font-size: 1.35rem;
   font-weight: 600;

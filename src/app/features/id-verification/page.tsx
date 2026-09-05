@@ -8,13 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { BackButton } from "@/components/ui/BackButton";
 
-const MOCK_RESULTS = [
-  { field: "Full Name", groundTruth: "John Smith", ocr: "John Smith", match: true },
-  { field: "Course", groundTruth: "BSc Computer Science", ocr: "MSc Computer Science", match: false },
-  { field: "Expiry Date", groundTruth: "August 2024", ocr: "August 2026", match: false },
-  { field: "Student ID", groundTruth: "20210445", ocr: "20210445", match: true },
-];
-
 export default function IdVerificationPage() {
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -144,21 +137,7 @@ export default function IdVerificationPage() {
             ) : (
               <div className={styles.previewContainer}>
                 <img src={preview} alt="ID Preview" className={styles.previewImage} />
-                
-                {isScanning && (
-                  <div className={styles.scanOverlay}>
-                    <div className={styles.targetBox} />
-                    <div className={styles.scanningText}>Extracting visual text & QR token...</div>
-                  </div>
-                )}
-                
-                {resultReady && (
-                  <div className={styles.highlightsOverlay}>
-                    <div className={cn(styles.highlightBox, styles.qrHighlight)}><QrCode size={16}/> Signed Token</div>
-                    <div className={cn(styles.highlightBox, styles.tamperHighlight)}>Text Tampering</div>
-                  </div>
-                )}
-                
+
                 <div className={styles.clearBtnWrapper}>
                   {!isScanning && (
                     <Button variant="secondary" size="sm" onClick={() => { setFile(null); setPreview(null); setResultReady(false); setResult(null); }}>
@@ -193,9 +172,9 @@ export default function IdVerificationPage() {
 
               {isScanning && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={styles.processingState}>
-                  <QrCode size={40} className={styles.spinningIcon} />
-                  <h4>Decoding Cryptographic Token</h4>
-                  <p>Fetching ground truth from institution database...</p>
+                  <QrCode size={32} className={styles.processingIcon} />
+                  <h4>Reading QR token</h4>
+                  <p>Loading the issuance record and comparing it against the photographed card...</p>
                 </motion.div>
               )}
 
@@ -205,7 +184,7 @@ export default function IdVerificationPage() {
                     <div className={styles.verdictHeader}>
                       <AlertTriangle size={32} className={styles.warningText} />
                       <div>
-                        <h2 className={styles.warningText}>UNVERIFIED</h2>
+                        <h2 className={styles.warningText}>Unverified</h2>
                         <p>{result.reason}</p>
                       </div>
                     </div>
@@ -213,7 +192,7 @@ export default function IdVerificationPage() {
                     <div className={styles.verdictHeader}>
                       <AlertTriangle size={32} className={styles.destructiveText} />
                       <div>
-                        <h2 className={styles.destructiveText}>FRAUD_FLAG</h2>
+                        <h2 className={styles.destructiveText}>Fraud flag</h2>
                         <p>{result.reason}</p>
                       </div>
                     </div>
@@ -224,7 +203,7 @@ export default function IdVerificationPage() {
                           <>
                             <AlertTriangle size={32} className={styles.destructiveText} />
                             <div>
-                              <h2 className={styles.destructiveText}>FRAUD DETECTED</h2>
+                              <h2 className={styles.destructiveText}>Fraud detected</h2>
                               <p>{result.tampered_fields.length} fields show signs of physical or digital tampering.</p>
                             </div>
                           </>
@@ -232,8 +211,8 @@ export default function IdVerificationPage() {
                           <>
                             <UserCheck size={32} className={styles.successText} />
                             <div>
-                              <h2 className={styles.successText}>VERIFIED</h2>
-                              <p>All fields match ground truth.</p>
+                              <h2 className={styles.successText}>Verified</h2>
+                              <p>All fields match the issuance record.</p>
                             </div>
                           </>
                         )}
@@ -269,11 +248,6 @@ export default function IdVerificationPage() {
                     </>
                   )}
 
-                  <div className={styles.technicalDetails}>
-                    <h4>Token Analysis</h4>
-                    <p>Signature: <span className={styles.successText}>Valid</span></p>
-                    <p>Replay Attack: <span className={styles.successText}>None detected</span></p>
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -286,8 +260,8 @@ export default function IdVerificationPage() {
           <>
             <div className={styles.generateLeftCol}>
               <Card glass hoverEffect className={styles.generateFormCard}>
-                <h3 style={{ marginBottom: "0.5rem", fontSize: "1.75rem", fontWeight: "700" }}>User Security Details</h3>
-                <p style={{ color: "var(--muted-foreground)", marginBottom: "2rem", fontSize: "0.95rem" }}>Enter the ground truth details to mathematically bind to the QR token.</p>
+                <h3 style={{ marginBottom: "0.5rem", fontSize: "1.4rem", fontWeight: "700", letterSpacing: "-0.015em" }}>Card details</h3>
+                <p style={{ color: "var(--muted-foreground)", marginBottom: "2rem", fontSize: "0.95rem", lineHeight: "1.6" }}>These details become the ground truth the signed QR points to.</p>
                 <div className={styles.generateFormSpacing}>
                   <div className={styles.inputGrid}>
                     <div className={styles.inputGroup}>
@@ -337,7 +311,7 @@ export default function IdVerificationPage() {
                     isLoading={isGenerating}
                     style={{ marginTop: "1rem" }}
                   >
-                    Generate Secure Cryptographic QR
+                    Generate signed QR
                   </Button>
                 </div>
               </Card>
@@ -352,8 +326,8 @@ export default function IdVerificationPage() {
                       initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                       style={{ textAlign: "center", margin: "auto" }}
                     >
-                      <QrCode size={56} style={{ color: "var(--muted-foreground)", opacity: 0.5, marginBottom: "1.5rem" }} />
-                      <p style={{ color: "var(--muted-foreground)", fontSize: "1.1rem" }}>Awaiting Data Inputs...</p>
+                      <QrCode size={48} style={{ color: "var(--muted-foreground)", opacity: 0.5, marginBottom: "1.25rem" }} />
+                      <p style={{ color: "var(--muted-foreground)", fontSize: "0.95rem" }}>Fill in the card details to generate a QR.</p>
                     </motion.div>
                   )}
                   {isGenerating && (
@@ -362,8 +336,8 @@ export default function IdVerificationPage() {
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                       style={{ margin: "auto", display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}
                     >
-                      <div className={styles.spinningIcon}><QrCode size={48} /></div>
-                      <p style={{ color: "var(--primary)", fontSize: "1.1rem" }}>Signing metadata locally...</p>
+                      <div className={styles.processingIcon}><QrCode size={32} /></div>
+                      <p style={{ color: "var(--muted-foreground)", fontSize: "0.95rem" }}>Generating signed QR...</p>
                     </motion.div>
                   )}
                   {generatedQr && (
@@ -373,9 +347,9 @@ export default function IdVerificationPage() {
                       style={{ textAlign: "center", margin: "auto" }}
                     >
                       <img src={generatedQr} alt="Secure QR Code" className={styles.qrImage} />
-                      <p style={{ marginTop: "20px", color: "var(--success)", fontWeight: "600", fontSize: "1.1rem" }}>{generationMsg}</p>
+                      <p style={{ marginTop: "20px", color: "var(--success)", fontWeight: "600", fontSize: "1rem" }}>{generationMsg}</p>
                       <p style={{ marginTop: "1rem", fontSize: "0.9rem", color: "var(--muted-foreground)", lineHeight: "1.6" }}>
-                        Print this QR on the physical ID. The scanner will read this URL, extract the <code style={{color: 'var(--foreground)', background: 'rgba(255,255,255,0.1)', padding:'2px 6px', borderRadius:'4px'}}>signed_token</code>, verify ground-truth, and run OCR against the card to detect physical/digital alterations!
+                        Print this QR on the physical card. Verification reads the signed token from it, loads the issuance record, and cross-checks the photographed card with OCR.
                       </p>
                     </motion.div>
                   )}

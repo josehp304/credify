@@ -129,7 +129,7 @@ by a vendor outage. This appears four separate times:
 
 | Call site | Primary | Fallback | Last resort |
 |---|---|---|---|
-| `utils/aiDetection.js` | Hive AI v3 | Gemini vision prompt | — |
+| `utils/aiDetection.js` | C2PA parse (local) → Hive AI v3 | Gemini vision prompt | honest "detectors unavailable" |
 | `routes/review.js` | Gemini JSON | regex heuristics (`assessAiText`) | — |
 | `routes/extension.js` | Gemini batch | server-side heuristic | heuristic on parse crash |
 | `extension/background.js` | Credify backend | identical local heuristic | — |
@@ -137,6 +137,9 @@ by a vendor outage. This appears four separate times:
 The fallbacks are silent — the response shape is identical, so a caller cannot tell
 whether a verdict came from a frontier model or from four regexes. Good for uptime,
 but it means **a missing `GEMINI_API_KEY` degrades quality without any error surfacing.**
+The one exception is image AI-detection: when both Hive and Gemini fail it now returns
+`detectors_unavailable: true` with a zero score instead of a fabricated verdict, and the
+refund route flags such requests for human review rather than auto-approving blind.
 
 The heuristic in `extension.js` is duplicated almost verbatim in `background.js`
 (same keyword list, same emoji regex, same repetition ratio) so the extension keeps
@@ -150,29 +153,48 @@ working with the backend entirely unreachable.
 
 Multipart `image` upload, held in memory (`multer.memoryStorage()`), never written to disk.
 
-**Signals.** Two, weighted deliberately unequally:
+**Signals.** Three, weighted deliberately unequally:
 
-- *AI forensics* (`utils/aiDetection.js`). Posts base64 to Hive's
-  `ai-generated-and-deepfake-content-detection` v3 endpoint, reads the `ai_generated` and
-  `deepfake` class values. On any non-OK response or throw, falls through to a Gemini
-  vision prompt that asks for a five-layer analysis (C2PA provenance metadata, visual
-  artifacts, compression clues, classifier probability, final label) returned as JSON.
+- *C2PA provenance* (`utils/c2paAnalysis.js`). Runs **first and locally** via the
+  official `@contentauth/c2pa-node` library — it parses the JUMBF manifest, validates the
+  signature, and reads the `c2pa.actions` assertion's `digitalSourceType`. A valid
+  manifest declaring an AI source type (`trainedAlgorithmicMedia`, `algorithmicMedia`, …)
+  is conclusive: the route returns `DENY` and never spends a Hive/Gemini call. A
+  `validation_state` of `Invalid` or a `dataHash.mismatch` failure means the pixels were
+  edited after signing → `tampered` → `DENY`. A signed *edit* trail (`c2pa.edited`,
+  `composite`) → `ai_edited` → `FLAG`. **Absence of a manifest is neutral**, never
+  suspicious — most images have none.
+- *AI forensics* (`utils/aiDetection.js`). If C2PA is not conclusive, posts base64 to
+  Hive's `ai-generated-and-deepfake-content-detection` v3 endpoint, reading the
+  `ai_generated` and `deepfake` class values. On any non-OK response or throw, falls
+  through to a Gemini vision prompt scoped **strictly to visible pixels** — it is no
+  longer asked about metadata it cannot see. If both are down it returns
+  `detectors_unavailable` rather than a fabricated score.
 - *EXIF* (`utils/exifAnalysis.js`). `exifr` parse flagging `missing_camera_info`,
   `editing_software_detected` (regex over `Software` for photoshop/lightroom/gimp/
   midjourney/dall-e/stable diffusion), or `missing_all_metadata`.
 
-**Fusion.** AI dominates; EXIF is corroboration only:
+**Fusion.** Signed AI provenance and the pixel classifier both dominate; a signed edit
+trail, weak classifier score, 3+ EXIF flags, or detectors being down all escalate to
+review; EXIF alone never can:
 
 ```
-isAi  ->                         HIGH   / DENY            / FAIL
-aiScore > 0.3 OR exif flags > 2  MEDIUM / FLAG_FOR_REVIEW / FLAG
-otherwise                        LOW    / AUTO_APPROVE    / PASS
+C2PA ai_generated/tampered, OR isAi           HIGH   / DENY            / FAIL
+C2PA ai_edited, OR aiScore > 0.3,             MEDIUM / FLAG_FOR_REVIEW / FLAG
+  OR exif flags > 2, OR detectors_unavailable
+otherwise                                     LOW    / AUTO_APPROVE    / PASS
 ```
 
 One or two EXIF flags are **intentionally ignored** — stripped metadata is normal for
 screenshots and messaging apps, so EXIF alone can never escalate risk.
 
 Then the two-pass trust re-evaluation of §3.1 runs.
+
+> **Why real C2PA, not a prompt.** The old fallback asked Gemini to "check for C2PA
+> provenance metadata." Vision models receive only decoded pixels and cannot read the
+> JUMBF boxes a manifest lives in, so those answers were hallucinated. Provenance is now
+> parsed and cryptographically validated locally; the model is asked only what it can
+> actually observe.
 
 ### 5.2 Document watermarking — `POST /api/v1/document/watermark` · `/verify`
 

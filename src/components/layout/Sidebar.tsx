@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Settings,
   LifeBuoy,
-  User,
   LogOut,
   ChevronRight
 } from "lucide-react";

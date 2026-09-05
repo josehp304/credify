@@ -4,13 +4,7 @@ import styles from "./page.module.css";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { BackButton } from "@/components/ui/BackButton";
-import { 
-  MessageSquare, 
-  Mail, 
-  HelpCircle, 
-  ExternalLink,
-  LifeBuoy
-} from "lucide-react";
+import { MessageSquare, ExternalLink } from "lucide-react";
 
 export default function SupportPage() {
   return (
@@ -23,7 +17,7 @@ export default function SupportPage() {
 
       <div className={styles.grid}>
           <section className={styles.formSection}>
-              <Card glass className={styles.supportCard}>
+              <Card className={styles.supportCard}>
                   <h3 className={styles.faqQuestion}>Send us a message</h3>
                   <p className={styles.faqAnswer} style={{ marginBottom: '2rem' }}>
                       Typical response time: Under 2 hours.

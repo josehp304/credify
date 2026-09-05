@@ -122,8 +122,14 @@ When adding a verification feature: Express route → proxy rule → relative
 Routes stay thin; all detection logic is isolated in `backend/src/utils/` so models can
 be swapped without touching routes:
 
-- `aiDetection.js` — Hive AI v3 primary, **falls back to Gemini** on any non-OK
-  response or throw.
+- `c2paAnalysis.js` — real C2PA (Content Credentials) parsing via the official
+  `@contentauth/c2pa-node` (needs Node >=22). Validates the manifest signature and reads
+  `digitalSourceType`; returns a `verdict` of `ai_generated` / `tampered` / `ai_edited` /
+  `authentic_capture` / `present` / `absent`. **Absence is neutral, never suspicious.**
+- `aiDetection.js` — layered: C2PA first (a signed AI manifest short-circuits to a verdict
+  with no paid call), then Hive AI v3, **falling back to Gemini** (pixels only — never
+  asked about metadata it can't see) on any non-OK response or throw. If both classifiers
+  fail it returns `detectors_unavailable` instead of a fabricated score.
 - `steganography.js` — LSB watermarking via Jimp, writing one bit into each of the R/G/B
   channels and terminated by a `||END||` delimiter. **Always returns PNG** — the payload
   does not survive JPEG re-encoding, which is precisely the tamper-evidence mechanism.

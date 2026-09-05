@@ -1,7 +1,7 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  background: #000;
+  background: var(--background);
   flex-direction: column;
 }
 
@@ -9,7 +9,6 @@
   flex: 1;
   margin-left: 280px;
   padding: 2rem;
-  background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
   min-height: 100vh;
 }
 
@@ -18,9 +17,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: rgba(10, 10, 10, 0.9);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 40;
@@ -29,7 +27,7 @@
 .mobileMenuBtn {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--foreground);
   cursor: pointer;
   display: flex;
   align-items: center;

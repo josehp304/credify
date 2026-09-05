@@ -18,10 +18,11 @@ router.post('/verify', upload.single('image'), async (req, res) => {
 
     const { email, phone_number } = req.body;
 
-    // 1. AI Detection (using Gemini Forensics Pipeline)
+    // 1. AI Detection: C2PA provenance first (deterministic), then Hive/Gemini
     const aiResults = await detectAiGeneratedImage(req.file.buffer, req.file.mimetype || 'image/jpeg');
     const aiScore = Math.max(aiResults.artifact_score || 0, aiResults.classifier_score || 0);
     const isAi = (aiResults.final_label || "").includes("AI") || aiScore > 0.5 || aiResults.metadata_detected;
+    const c2pa = aiResults.c2pa || { present: false, verdict: 'absent' };
 
     // 2. EXIF Analysis
     const exifResults = await analyzeExif(req.file.buffer);
@@ -33,12 +34,13 @@ router.post('/verify', upload.single('image'), async (req, res) => {
 
     // Give high weightage to AI model results, lower weightage to EXIF analysis
     if (isAi) {
-      // AI score > 0.5 immediately results in HIGH risk outright
+      // Conclusive: pixel classifier fired, or signed provenance says AI/tampered
       riskLevel = 'HIGH';
       action = 'DENY';
       outcome = 'FAIL';
-    } else if (aiScore > 0.3 || exifResults.flags.length > 2) {
-      // AI score > 0.3 or 3+ EXIF errors triggers a MEDIUM risk. (1-2 EXIF flags ignored)
+    } else if (aiResults.detectors_unavailable || aiScore > 0.3 || exifResults.flags.length > 2 || c2pa.verdict === 'ai_edited') {
+      // MEDIUM: weak classifier signal, 3+ EXIF flags (1-2 ignored), a signed
+      // AI-edit trail, or the classifiers being down (never auto-approve blind).
       riskLevel = 'MEDIUM';
       action = 'FLAG_FOR_REVIEW';
       outcome = 'FLAG';
@@ -64,7 +66,20 @@ router.post('/verify', upload.single('image'), async (req, res) => {
       recommended_action: action,
       trust_score: trustScore,
       signal_breakdown: {
-        ai_forensics: { result: isAi ? 'FAIL' : 'PASS', confidence: Math.round(aiScore * 100) },
+        ai_forensics: {
+          result: isAi ? 'FAIL' : 'PASS',
+          confidence: Math.round((aiResults.confidence ?? aiScore) * 100),
+          detail: aiResults.explanation,
+        },
+        provenance: {
+          result: ['ai_generated', 'tampered'].includes(c2pa.verdict) ? 'FAIL'
+            : c2pa.verdict === 'ai_edited' ? 'FLAG'
+            : 'PASS',
+          manifest_present: c2pa.present,
+          verdict: c2pa.verdict,
+          claim_generator: c2pa.claim_generator ?? null,
+          source_types: c2pa.source_types ?? [],
+        },
         exif_analysis: exifResults,
         trust_score_check: {
           result: trustScore < 80 ? 'FAIL' : 'PASS',

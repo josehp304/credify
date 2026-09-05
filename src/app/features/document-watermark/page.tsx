@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import styles from "./page.module.css";
-import { cn } from "@/lib/utils";
 import { BackButton } from "@/components/ui/BackButton";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -144,9 +143,9 @@ export default function DocumentWatermarkPage() {
                     onClick={processFile}
                     className={styles.submitBtn}
                   >
-                    {isProcessing 
-                      ? (mode === "issue" ? "Encoding Payload..." : "Extracting DCT Watermark...") 
-                      : (mode === "issue" ? "Generate Secured Document" : "Verify Integrity")
+                    {isProcessing
+                      ? (mode === "issue" ? "Embedding watermark..." : "Reading watermark...")
+                      : (mode === "issue" ? "Generate secured document" : "Verify integrity")
                     }
                   </Button>
                 </div>
@@ -162,8 +161,8 @@ export default function DocumentWatermarkPage() {
                   result.success ? (
                     <div className={styles.successResult}>
                       <ShieldCheck size={64} className={styles.successIcon} />
-                      <h2>Document Secured</h2>
-                      <p>Cryptography embedded in DCT domain. Any AI regeneration or modification will destroy the invisible payload.</p>
+                      <h2>Document secured</h2>
+                      <p>An invisible watermark now lives in the image pixels. Any AI regeneration, edit, or re-encoding destroys it, which is exactly how tampering gets caught.</p>
                       <div className={styles.payloadPreview}>
                         <strong>Status:</strong> <span>{result.hash}</span>
                       </div>
@@ -188,12 +187,12 @@ export default function DocumentWatermarkPage() {
                   result.verdict === "VERIFIED" ? (
                     <div className={styles.successResult}>
                       <ShieldCheck size={64} className={styles.successIcon} />
-                      <h2>Verification Passed</h2>
-                      <p>Invisible watermark extracted successfully. Payload matches database ground truth.</p>
+                      <h2>Verification passed</h2>
+                      <p>The invisible watermark was recovered intact and matches the issuance record.</p>
                       <ul className={styles.proofList}>
-                        <li><ShieldCheck size={16}/> Cryptographic signature valid</li>
-                        <li><ShieldCheck size={16}/> Document hash unchanged</li>
-                        <li><ShieldCheck size={16}/> No AI regeneration detected</li>
+                        <li><ShieldCheck size={16}/> Watermark recovered intact</li>
+                        <li><ShieldCheck size={16}/> Payload matches issuance record</li>
+                        <li><ShieldCheck size={16}/> No regeneration detected</li>
                         {result.document_data && <li><ShieldCheck size={16}/> Recipient: {result.document_data.recipient_name}</li>}
                       </ul>
                       <Button onClick={() => { setFile(null); setResult(null); setDownloadUrl(null); }}>Verify Another</Button>
@@ -201,8 +200,8 @@ export default function DocumentWatermarkPage() {
                   ) : (
                     <div className={styles.failResult}>
                       <ShieldAlert size={64} className={styles.failIcon} />
-                      <h2>Tampering Detected</h2>
-                      <p>{result.reason || "The spread-spectrum watermark is unreadable or heavily degraded. This document has been mathematically proven to be altered or AI-regenerated."}</p>
+                      <h2>Tampering detected</h2>
+                      <p>{result.reason || "No readable watermark was found. The document was either never issued by Credify, or it has been altered, re-encoded, or AI-regenerated since issuance."}</p>
                       <Button variant="outline" onClick={() => { setFile(null); setResult(null); setDownloadUrl(null); }}>Verify Another</Button>
                     </div>
                   )
@@ -227,14 +226,5 @@ export default function DocumentWatermarkPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function Scan({ size, className }: { size?: number, className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-      <line x1="7" y1="12" x2="17" y2="12" />
-    </svg>
   );
 }
