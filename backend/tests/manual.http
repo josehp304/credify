@@ -1,0 +1,31 @@
+### Get Trust Score
+GET http://localhost:3000/api/v1/user/trust-score?email=test@example.com
+
+###
+
+### Score a Review
+POST http://localhost:3000/api/v1/review/score
+Content-Type: application/json
+
+{
+    "reviewer_email": "test@example.com",
+    "review_text": "This product is an absolute testament to modern engineering. I delve into its features daily.",
+    "platform_id": "shopify_01"
+}
+
+###
+
+### Submit Refund Verifcation (Requires an actual file, use Postman or curl for multipart)
+POST http://localhost:3000/api/v1/refund/verify
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="email"
+
+test@example.com
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="image.jpg"
+Content-Type: image/jpeg
+
+< ./path/to/image.jpg
+--WebAppBoundary--

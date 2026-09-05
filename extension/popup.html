@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Review Checker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="logo-group">
+        <img src="logo.png" alt="Credify" class="logo-img">
+      </div>
+      <span class="version-badge">v1.1</span>
+    </header>
+
+    <div class="stats-grid">  
+      <div class="metric-card">
+        <span class="metric-label">Analyzed</span>
+        <span class="metric-value" id="totalReviews">0</span>
+      </div>
+      <div class="metric-card genuine-card">
+        <span class="metric-label">Genuine</span>
+        <span class="metric-value genuine-text" id="genuineCount">0%</span>
+      </div>
+      <div class="metric-card spam-card">
+        <span class="metric-label">Spam</span>
+        <span class="metric-value spam-text" id="spamCount">0%</span>
+      </div>
+    </div>
+
+    <div class="action-section">
+      <button id="analyzeBtn" class="primary-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Analyze Page Reviews
+      </button>
+
+      <label class="toggle-container">
+        <div class="toggle-text">
+          <span class="toggle-title">Auto-Run Scanner</span>
+          <span class="toggle-desc">Scan lazily loaded reviews instantly</span>
+        </div>
+        <div class="switch">
+          <input type="checkbox" id="autoRun">
+          <span class="slider"></span>
+        </div>
+      </label>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

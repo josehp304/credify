@@ -1,0 +1,331 @@
+.container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.header {
+  max-width: 40rem;
+}
+
+.title {
+  font-size: clamp(1.9rem, 3.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin: 0 0 0.9rem;
+}
+
+.subtitle {
+  color: var(--muted-foreground);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inputCol,
+.resultCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputCard,
+.resultCard {
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+
+.cardIcon {
+  color: var(--muted-foreground);
+  width: 20px;
+  height: 20px;
+}
+
+.cardHeader h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  background: var(--background);
+  border: 1px solid var(--border-strong);
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  color: var(--foreground);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.actionBtn {
+  margin-top: auto;
+  width: 100%;
+}
+
+/* Result side */
+.emptyState,
+.processingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  flex: 1;
+  color: var(--muted-foreground);
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.processingState h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--foreground);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border-strong);
+  border-left-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.resultData {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  height: 100%;
+}
+
+.scoreBanner {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+.scoreCircleWrapper {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+}
+
+.circularChart {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.circleBg {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2.5;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.circleLow {
+  stroke: var(--destructive);
+}
+
+.circleMid {
+  stroke: #e4b363;
+}
+
+.circleHigh {
+  stroke: var(--success);
+}
+
+.scoreTextOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scoreNumber {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground);
+}
+
+.scoreDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.scoreLabel {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+.scoreDetails h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--foreground);
+  margin: 0 0 0.35rem;
+}
+
+.recommendationBadge {
+  display: inline-block;
+  border: 1px solid var(--border-strong);
+  color: var(--muted-foreground);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.signalsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.signalCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1rem 0.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.signalIconWrapper {
+  display: flex;
+  align-items: center;
+  padding-top: 0.1rem;
+}
+
+.iconFail {
+  color: var(--destructive);
+}
+
+.iconPass {
+  color: var(--success);
+}
+
+.signalContent {
+  flex: 1;
+}
+
+.signalContent h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.signalContent p {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.signalVerdict {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badgeFail {
+  color: var(--destructive);
+}
+
+.badgePass {
+  color: var(--success);
+}
+
+.backButtonWrapper {
+  align-self: flex-start;
+  margin-bottom: -1rem;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem 3rem;
+    gap: 1.5rem;
+  }
+  .scoreBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

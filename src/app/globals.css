@@ -1,0 +1,70 @@
+@import "@neondatabase/auth/ui/css";
+
+:root {
+  --background: #030712;
+  --foreground: #e9edf4;
+  --muted: #131a29;
+  --muted-foreground: #94a0b4;
+  --border: rgba(151, 168, 194, 0.14);
+  --border-strong: rgba(151, 168, 194, 0.26);
+  --primary: #4fb2f5;
+  --primary-glow: rgba(79, 178, 245, 0.18);
+  --secondary: #7f93ad;
+  --secondary-glow: rgba(127, 147, 173, 0.15);
+  --accent: #0a0f1a;
+  --card: #0a0f1a;
+  --card-foreground: #e9edf4;
+  --destructive: #f0716f;
+  --success: #3fcf9a;
+  --radius: 0.625rem;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-schibsted), var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Legacy utility: now renders as plain high-contrast text */
+.text-gradient {
+  color: var(--foreground);
+}
+
+/* Legacy utility: now a flat panel */
+.glass {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.app-main {
+  flex: 1;
+  padding-top: 80px;
+  position: relative;
+  z-index: 1;
+}

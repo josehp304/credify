@@ -1,0 +1,226 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+}
+
+.hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(4rem, 10vh, 7rem) 1.5rem 1rem;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.4rem, 5vw, 3.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  max-width: 20ch;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--muted-foreground);
+  max-width: 40rem;
+  margin: 1.5rem 0 0;
+  line-height: 1.65;
+}
+
+.demoNote {
+  margin: 1.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+.dashboardSection {
+  padding: 3rem 1.5rem 6rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.35rem;
+}
+
+.cardSub {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Network visualization */
+
+.networkVisualization {
+  position: relative;
+  height: 360px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.node {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  background: var(--muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 2;
+  transition: border-color 0.2s ease;
+}
+
+.node:hover {
+  border-color: var(--primary);
+}
+
+.nodeCenter {
+  width: 92px;
+  height: 92px;
+  background: var(--card);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+
+.connectionLine {
+  position: absolute;
+  background: var(--border-strong);
+  height: 1px;
+  z-index: 1;
+  transform-origin: left center;
+}
+
+/* Score */
+
+.scoreVisualizer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  height: 100%;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.scoreCircle {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-strong);
+}
+
+.scoreContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.scoreValue {
+  font-family: var(--font-schibsted), system-ui, sans-serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--success);
+  line-height: 1;
+}
+
+.scoreLabel {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+/* Audit log */
+
+.logTableContainer {
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.logHeader {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.logRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 0.25rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+}
+
+.logRow:last-child {
+  border-bottom: none;
+}
+
+.logRow:hover {
+  background: rgba(151, 168, 194, 0.05);
+}
+
+.logStore {
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.logStore small {
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.logAction {
+  color: var(--muted-foreground);
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  border: 1px solid var(--border);
+}
+
+.logTrust {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.logTrust.positive { color: var(--success); }
+.logTrust.neutral { color: var(--muted-foreground); }
+.logTrust.negative { color: var(--destructive); }
+
+@media (max-width: 900px) {
+  .dashboardSection {
+    grid-template-columns: 1fr;
+  }
+
+  .networkVisualization {
+    height: 300px;
+  }
+}

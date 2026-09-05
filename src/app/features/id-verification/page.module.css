@@ -1,0 +1,482 @@
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  color: var(--muted-foreground);
+  font-size: 1.125rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scanCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.uploadCard {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.uploadBox {
+  flex: 1;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  gap: 1rem;
+}
+
+.uploadIcon {
+  color: var(--muted-foreground);
+}
+
+.uploadBox h3 {
+  font-size: 1.25rem;
+}
+
+.uploadBox p {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.previewContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.previewImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.clearBtnWrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 20;
+}
+
+.actionBtn {
+  width: 100%;
+  height: 3.5rem;
+  font-size: 1.125rem;
+}
+
+.scanOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.targetBox {
+  width: 250px;
+  height: 150px;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  position: relative;
+  animation: scanBox 2s infinite alternate;
+}
+
+@keyframes scanBox {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  100% { transform: scale(1.05); opacity: 1; border-color: var(--secondary); }
+}
+
+.scanningText {
+  position: absolute;
+  bottom: 20%;
+  color: white;
+  font-family: monospace;
+  background: rgba(0,0,0,0.8);
+  padding: 0.5rem 1rem;
+  border-radius: 99px;
+  font-size: 0.875rem;
+}
+
+.highlightsOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.highlightBox {
+  position: absolute;
+  border: 2px solid;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.6);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  backdrop-filter: blur(4px);
+}
+
+.qrHighlight {
+  top: 60%;
+  left: 10%;
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.tamperHighlight {
+  top: 40%;
+  right: 10%;
+  border-color: var(--destructive);
+  color: var(--destructive);
+}
+
+/* Result Column */
+.resultCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.resultCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.emptyState, .processingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  min-height: 400px;
+  color: var(--muted-foreground);
+  gap: 1rem;
+}
+
+.emptyIcon {
+  opacity: 0.3;
+}
+
+.spinningIcon {
+  color: var(--primary);
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.resultData {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.verdictHeader {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+}
+
+.destructiveText {
+  color: var(--destructive);
+}
+
+.verdictHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.verdictHeader p {
+  color: var(--foreground);
+  font-size: 0.95rem;
+}
+
+.comparisonTable {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1.5fr 80px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1.5fr 80px;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  gap: 1rem;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.fieldLabel {
+  font-weight: 500;
+  color: var(--foreground);
+  font-size: 0.875rem;
+}
+
+.groundTruthText {
+  color: var(--success);
+  font-family: monospace;
+  font-size: 0.875rem;
+}
+
+.ocrText {
+  color: var(--foreground);
+  font-family: monospace;
+  font-size: 0.875rem;
+}
+
+.mismatchText {
+  color: var(--destructive);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(239, 68, 68, 0.5);
+}
+
+.statusCell {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.badgePass {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badgeFail {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--destructive);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.technicalDetails {
+  background: rgba(0,0,0,0.3);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+}
+
+.technicalDetails h4 {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  color: var(--muted-foreground);
+}
+
+.technicalDetails p {
+  font-size: 0.875rem;
+  font-family: monospace;
+  margin-bottom: 0.25rem;
+}
+
+.successText {
+  color: var(--success);
+}
+
+
+.backButtonWrapper {
+  align-self: flex-start;
+  margin-bottom: -1rem;
+}
+
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+  }
+  .title {
+    font-size: 1.75rem;
+  }
+  .mainContent {
+    gap: 1.5rem;
+  }
+  .actionBtn {
+    font-size: 1rem;
+    height: 3rem;
+  }
+}
+
+/* Premium Generation Form Inputs */
+.generateFormSpacing {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .inputGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.inputLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  transition: color 0.3s ease;
+}
+
+.inputGroup:focus-within .inputLabel {
+  color: var(--primary);
+}
+
+.glassInput {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: white;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(10px);
+}
+
+.glassInput::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.glassInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent), inset 0 0 15px color-mix(in srgb, var(--primary) 10%, transparent);
+  transform: translateY(-2px);
+}
+
+.qrImage {
+  width: 220px;
+  height: 220px;
+  border-radius: 1rem;
+  border: 4px solid var(--primary);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--primary) 30%, transparent);
+  background: white;
+  padding: 0.5rem;
+  margin: 0 auto;
+}
+
+.generateFormCard {
+  padding: 2.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.qrDisplayCard {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  height: 100%;
+  text-align: center;
+}
+
+.generateLeftCol {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.generateRightCol {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

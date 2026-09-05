@@ -1,0 +1,27 @@
+.card {
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: border-color 0.25s ease;
+}
+
+.inner {
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+}
+
+/* Legacy prop: glass now renders identically to the flat card */
+.glass {
+  background: var(--card);
+}
+
+.hoverEffect:hover {
+  border-color: var(--border-strong);
+}
